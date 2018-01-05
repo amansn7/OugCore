@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Extraction</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="static/css/bootstrap/bootstrap.min.css" rel="stylesheet">
+        <link href="static/css/fontAwesome/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="static/upload/component.css" />
+        <link rel="stylesheet" type="text/css" href="static/css/cssLoader.css" />
+        <!--<link rel="stylesheet" type="text/css" href="static/css/jquerytour.css" />-->
+        <!--<link rel="stylesheet" type="text/css" href="static/upload/demo.css" />-->
+    </head>
+    <body class="body">
+        <div class="container-fluid">
+            <header class="tour_7 header">
+              <span class='Header-font'>  ICR Engine </span>
+            </header>
+<!--            <div class="col-lg-12">
+                <div class="col-sm-9"></div>   
+                <div class="col-sm-3"></div>   
+            </div>-->
+<div class="content">
+            <div class="col-lg-12" style="text-align: center;margin-top: 10%">
+                <img style="width:20%" src="static/images/logo.png" >    
+            </div>
+            <div class="col-lg-12" style="margin-top: 1%">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8">
+                    
+                    
+                        <div class="box left col-sm-12" style="text-align: center">
+                           
+                            <input type="file" style="display: none" name="file-7[]" id="file-7" onchange="getDirectory(event)" class="inputfile inputfile-6" webkitdirectory mozdirectory msdirectory odirectory directory multiple data-multiple-caption="{count} files selected" multiple />
+                            <label class="tour_1" for="file-7" class="col-sm-12" style="height:32px" ><div class="col-sm-8"><span class="col-sm-8"></span></div > <div class="col-sm-4"><strong  style="float: right;position: absolute;right:0"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="17" viewBox="0 0 20 17"><path d="M10 0l-5.2 4.9h3.3v5.1h3.8v-5.1h3.3l-5.2-4.9zm9.3 11.5l-3.2-2.1h-2l3.4 2.6h-3.5c-.1 0-.2.1-.2.1l-.8 2.3h-6l-.8-2.2c-.1-.1-.1-.2-.2-.2h-3.6l3.4-2.6h-2l-3.2 2.1c-.4.3-.7 1-.6 1.5l.6 3.1c.1.5.7.9 1.2.9h16.3c.6 0 1.1-.4 1.3-.9l.6-3.1c.1-.5-.2-1.2-.7-1.5z"/></svg> Choose a directory</strong></div></label>
+				</div>
+<!--                        <input type="file" id="files" name="files[]" multiple />
+                        <output id="list"></output>-->
+               
+                    
+                </div>
+                <div class="col-sm-2"></div>
+                
+            </div>
+            <div class="box left col-lg-12" style="text-align: center;margin-top:2%">
+               
+                
+                   
+                    <button type="button" style="width:15%" class="tour_2 btn btn-lg btn-info active" onclick="showLoading()">Extract</button>
+                    
+               
+                <!--<button type="button" class="btn btn-sm btn-info active" onclick="browseDirectory()">Convert</button>--> 
+            
+            
+        </div>
+            <div class="col-lg-12" style="text-align: center">
+            <div id="floatBarsG" class="" style="margin-top: 3%;display: none">
+	<div id="floatBarsG_1" class="floatBarsG"></div>
+	<div id="floatBarsG_2" class="floatBarsG"></div>
+	<div id="floatBarsG_3" class="floatBarsG"></div>
+	<div id="floatBarsG_4" class="floatBarsG"></div>
+	<div id="floatBarsG_5" class="floatBarsG"></div>
+	<div id="floatBarsG_6" class="floatBarsG"></div>
+	<div id="floatBarsG_7" class="floatBarsG"></div>
+	<div id="floatBarsG_8" class="floatBarsG"></div>
+</div>
+</div>
+            <div class="col-sm-12" style="margin-top: 7%">
+               
+                <div class="col-sm-12" id="content" style="display:none;text-align: center"> <h3><em>Data has been extracted, press download  to get the text file.</em> </h3></div>
+                
+            </div>
+            <div class="col-sm-12" style="margin-top: 4%">
+                <div class="col-sm-8"></div>
+                <div class="col-sm-4" ><button id="DownloadCSV" type="button" style="display:none" class="tour_3 btn btn-lg btn-info active" onclick="readJSON()">Download </button></div>
+                
+            </div> 
+</div>
+            <footer class="footer">
+          <div class="pull-right">
+            <h5>   Terms & Conditions . Privacy Policy . <i class="fa fa-copyright" aria-hidden="true"></i> 2017 Powered by @ Technosoft .</h5>
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        </div>
+          <!--<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>-->
+    <script src="static/jQuery/jquery.min.js"></script>
+    <script src="static/bootstrap/bootstrap.min.js"></script>
+    <script src="static/upload/custom-file-input.js"></script>
+        <script type="text/javascript">
+            function showLoading(){
+                $('#floatBarsG').addClass("modal "); 
+                $('#floatBarsG').css("display","block"); 
+//               $(".body").addClass("modal-backdrop in "); 
+              setTimeout(function(){
+                $('#floatBarsG').removeClass("modal "); 
+                $('#floatBarsG').css("display","none");
+                $('#DownloadCSV').css("display","block");
+                $('#content').css("display","block");
+                }, 5000);
+                 
+            }
+            
+          function getDirectory(e){
+                 var theFiles = e.target.files;
+                 var relativePath = theFiles[0].webkitRelativePath;
+//                 var folder = relativePath.split("/");
+                 var folder = relativePath;
+//                 alert(folder);
+                 
+          } 
+             
+           function readJSON(){
+//               $.getJSON("accuracy_kinrep.json",function(data){
+//                  JSONToCSVConvertor(data, "Accuracy Kinrep", true);
+//               });
+              $.get("static/extractCSV/form.csv",function(data){
+                 
+                 
+                   JSONToCSVConvertor(data, "Output", true);
+              })
+
+           }  
+
+// for the json data 
+function JSONToCSVConvertor1(JSONData, ReportTitle, ShowLabel) {
+    //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+    var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+    
+    var CSV = '';    
+    //Set Report title in first row or line
+    
+//    CSV += ReportTitle + '\r\n\n';
+
+    //This condition will generate the Label/Header
+    if (ShowLabel) {
+        var row = "";
+        
+        //This loop will extract the label from 1st index of on array
+        for (var index in arrData[0]) {
+            
+            //Now convert each value to string and comma-seprated
+            row += index + ',';
+        }
+
+        row = row.slice(0, -1);
+        
+        //append Label row with line break
+        CSV += row + '\r\n';
+    }
+    
+    //1st loop is to extract each row
+    for (var i = 0; i < arrData.length; i++) {
+        var row = "";
+        
+        //2nd loop will extract each column and convert it in string comma-seprated
+        for (var index in arrData[i]) {
+            row += '"' + arrData[i][index] + '",';
+        }
+
+        row.slice(0, row.length - 1);
+        
+        //add a line break after each row
+        CSV += row + '\r\n';
+    }
+
+    if (CSV == '') {        
+        alert("Invalid data");
+        return;
+    }   
+    
+    //Generate a file name
+    var fileName = "";
+    //this will remove the blank-spaces from the title and replace it with an underscore
+    fileName += ReportTitle.replace(/ /g,"_");   
+    
+    //Initialize file format you want csv or xls
+//    alert(CSV)
+    var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+    
+    // Now the little tricky part.
+    // you can use either>> window.open(uri);
+    // but this will not work in some browsers
+    // or you will not get the correct file extension    
+    
+    //this trick will generate a temp <a /> tag
+    var link = document.createElement("a");    
+    link.href = uri;
+    
+    //set the visibility hidden so it will not effect on your web-layout
+    link.style = "visibility:hidden";
+    link.download = fileName + ".xlsx";
+    
+    //this part will append the anchor tag and remove it after automatic click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+// end of code 
+
+//for the csv data 
+function JSONToCSVConvertor(CSV, ReportTitle, ShowLabel) {
+  //Generate a file name
+    var fileName = "";
+    //this will remove the blank-spaces from the title and replace it with an underscore
+    fileName += ReportTitle.replace(/ /g,"_");   
+    
+    //Initialize file format you want csv or xls
+    
+    var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
+    
+    // Now the little tricky part.
+    // you can use either>> window.open(uri);
+    // but this will not work in some browsers
+    // or you will not get the correct file extension    
+    
+    //this trick will generate a temp <a /> tag
+    var link = document.createElement("a");    
+    link.href = uri;
+    
+    //set the visibility hidden so it will not effect on your web-layout
+    link.style = "visibility:hidden";
+    link.download = fileName + "_Royal_Sundaram.xlsx";
+    
+    //this part will append the anchor tag and remove it after automatic click
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);  
+}
+
+        </script>
+    
+    </body>
+</html>

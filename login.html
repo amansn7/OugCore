@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+<script type="text/javascript" src="/static/login.js"></script>
+{% block body %}
+{% if session['logged_in'] %}
+<p>You're logged in already!</p>
+{% else %}
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="row" id="pwd-container">
+    <div class="col-md-4"></div>
+    
+    <div class="col-xs-6 col-sm-4">
+	<h4><center>Optical Character Recognition Engine</center></h4>
+      <section class="login-form">
+        <form method="post" action="/login" role="login">
+          <img src="static/images/logo.png" class="img-responsive" alt="" />
+		  
+          <input type="email" value="" placeholder="username" name="username" required class="form-control input-lg" />
+          
+          <input type="password" class="form-control input-lg" value="" placeholder="password" name="password" />
+          
+          
+          <div class="pwstrength_viewport_progress"></div>
+          
+          
+          <button type="submit" name="go" class="btn btn-lg btn-primary btn-block">Sign in</button>
+          
+          
+        </form>
+        
+        <div class="form-links">
+          <a href="http://technosoftcorp.com">www.technosoftcorp.com</a>
+        </div>
+      </section>  
+      </div>
+      
+      <div class="col-md-4"></div>
+      
+
+  </div>
+         
+</div>
+
+{% endif %}
+{% endblock %}
+
+</body> 
+</html>

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<style>
+	@media (min-width: 1200px) {
+    .container{
+        max-width: 1800px;
+    }
+}
+
+	.header_text
+	{
+		font-family:    Arial, Helvetica, sans-serif;
+		font-size:      20px;
+		font-weight:    bold;
+		position: relative;
+		text-align:center;
+	}
+
+
+</style>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<script src="http://d3js.org/d3.v2.js"></script>
+
+<style>
+
+path.line {
+    fill: none;
+    stroke: #666;
+    stroke-width: 1.5px;
+}
+
+.domain {
+    stroke-width: 1px;
+}
+
+circle {
+    cursor: pointer;
+}
+
+.axis {
+    shape-rendering: crispEdges;
+}
+
+.axis line, .axis path {
+    stroke-width: 1px;
+    stroke: #000;
+    fill: none;
+}
+
+.tooltip {
+    display: none;
+}
+
+.tooltip.active {
+    display: block;
+}
+
+.tooltip rect {
+    fill: #ff0000;
+}
+
+
+.bar { fill: steelblue; }
+
+  .bar{
+    fill: steelblue;
+  }
+
+  .bar:hover{
+    fill: brown;
+  }
+
+	.axis {
+	  font: 10px sans-serif;
+	}
+
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+	
+
+    </style>
+	
+</head>
+
+<body>
+<title>ICR Output</title>
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='table_style.css') }}">
+<body>
+
+    <div class="container">
+	  <div class="panel panel-default">
+        <div class="panel-heading"><img style="width:15%" src="/static/images/logo.png" > <br /> <p class="header_text">Intelligent Character Recognition Engine</p></div>
+        <div class="panel-body">
+			<div id="plot">
+			</div>
+		</div>
+	  </div>
+	</div>
+
+<!-- Viz -->	
+
+{% for file in file_name %}	
+
+{% if file == "Part_A.csv" %}
+
+<script>
+	// set the dimensions of the canvas
+var margin = {top: 20, right: 20, bottom: 70, left: 40},
+    width = 200 - margin.left - margin.right,
+    height = 300 - margin.top - margin.bottom;
+
+
+// set the ranges
+var x = d3.scale.ordinal().rangeRoundBands([0, width], .01);
+var y = d3.scale.linear().range([height, 0]);
+
+// define the axis
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .ticks(10);
+
+
+// add the SVG element
+var svg1 = d3.select("#plot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // add axis
+	// Rescale the axes.
+	var callback = function (data) {
+	
+	x.domain(data.map(function(d) { return d.keyi; }));
+	y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+	// Display the axes.
+	svg1.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.98em")
+      .attr("dy", "-.85em")
+      .attr("transform", "rotate(-90)" );
+
+	svg1.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+
+	// Insert the data points.
+	  
+	svg1.selectAll("bar").data(data).enter()
+		.append("rect")
+		  .attr("class", "bar")
+		  .attr("x", function(d) { return x(d.keyi); })
+		  .attr("width", x.rangeBand())
+		  .attr("y", function(d) { return y(d.value); })
+		  .attr("height", function(d) { return height - y(d.value); });	
+	
+};
+
+
+// set the dimensions of the canvas
+
+// add the SVG element
+var svg2 = d3.select("#plot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // add axis
+	// Rescale the axes.
+var callback1 = function (data) {
+	x.domain(data.map(function(d) { return d.keyi; }));
+	y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+	// Display the axes.
+	svg2.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.98em")
+      .attr("dy", "-.85em")
+      .attr("transform", "rotate(-90)" );
+
+	svg2.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+
+	// Insert the data points.
+	  
+	svg2.selectAll("bar").data(data).enter()
+		.append("rect")
+		  .attr("class", "bar")
+		  .attr("x", function(d) { return x(d.keyi); })
+		  .attr("width", x.rangeBand())
+		  .attr("y", function(d) { return y(d.value); })
+		  .attr("height", function(d) { return height - y(d.value); });	
+	
+};
+
+var svg3 = d3.select("#plot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // add axis
+	// Rescale the axes.
+var callback2 = function (data) {
+	x.domain(data.map(function(d) { return d.keyi; }));
+	y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+	// Display the axes.
+	svg3.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.98em")
+      .attr("dy", "-.85em")
+      .attr("transform", "rotate(-90)" );
+
+	svg3.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+
+	// Insert the data points.
+	  
+	svg3.selectAll("bar").data(data).enter()
+		.append("rect")
+		  .attr("class", "bar")
+		  .attr("x", function(d) { return x(d.keyi); })
+		  .attr("width", x.rangeBand())
+		  .attr("y", function(d) { return y(d.value); })
+		  .attr("height", function(d) { return height - y(d.value); });	
+	
+};
+
+var svg4 = d3.select("#plot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+  // add axis
+	// Rescale the axes.
+var callback3 = function (data) {
+	x.domain(data.map(function(d) { return d.keyi; }));
+	y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+	// Display the axes.
+	svg4.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+    .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.98em")
+      .attr("dy", "-.85em")
+      .attr("transform", "rotate(-90)" );
+
+	svg4.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 5)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Frequency");
+
+	// Insert the data points.
+	  
+	svg4.selectAll("bar").data(data).enter()
+		.append("rect")
+		  .attr("class", "bar")
+		  .attr("x", function(d) { return x(d.keyi); })
+		  .attr("width", x.rangeBand())
+		  .attr("y", function(d) { return y(d.value); })
+		  .attr("height", function(d) { return height - y(d.value); });	
+	
+};
+d3.json("/data/Part_A.csv/City", callback);
+d3.json("/data/Part_A.csv/Sex", callback1);
+d3.json("/data/Part_A.csv/State", callback2);
+d3.json("/data/Part_A.csv/Legal_Marital_Status", callback3);
+
+//d3.json("/data/Part_A.csv/Sex",callback1);
+</script>
+
+{% endif %}
+{% endfor %}
+

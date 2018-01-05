@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/style_upload.css" rel="stylesheet">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/static/upload.js"></script>
+<style>
+	@media (min-width: 1200px) {
+    .container{
+        max-width: 1800px;
+    }
+}
+
+	.header_text
+	{
+		font-family:    Arial, Helvetica, sans-serif;
+		font-size:      20px;
+		font-weight:    bold;
+		position: relative;
+		text-align:center;
+	}
+	
+    #navBarSearchForm input[type=text]{width:600px !important;}
+
+</style>
+</head>
+<div class="container">
+      <div class="panel panel-default">
+        <div class="panel-heading"><img style="width:15%" src="static/images/logo.png" > <br /> <p class="header_text">Optical Character Recognition Engine</p></div>
+        <div class="panel-body">
+
+	  <!-- Standar Form -->
+	  
+	<div class="alert alert-info">
+		<strong>Info!</strong> Only upload images or enter URL of images with extension JPEG, JPG and PNG <br />
+		<strong>Info!</strong> Make sure image is of proper resolution for best results 
+	</div>
+
+	  <h4>Select files from your computer</h4>
+	  <form action="/result" method="post" enctype="multipart/form-data" id="js-upload-form">
+		<div class="form-inline">
+		  <div class="form-group">
+			<input type="file" name="file[]" id="js-upload-files" multiple>
+		  </div>
+		  <button type="submit" class="btn btn-default" id="js-upload-form">Upload files</button>
+		</div>
+	  </form>
+
+	  <!-- Drop Zone -->
+	  <h4>Or Enter image url below</h4>
+	  
+		<form action="/result_image" method="post" enctype="multipart/form-data" id="navBarSearchForm">
+		<div class="form-inline">
+			<div class="form-group">
+			<input type="text" name="url" class="form-control" id="url" placeholder="URL #">
+			</div>
+			
+			<button type="submit" class="btn btn-default" id="js-upload-form">Submit</button>
+		</div>	
+		</form>  
+          
+
+          <!-- Upload Finished -->
+          
+        </div>
+      </div>
+    </div> <!-- /container -->
+	
+</html>
