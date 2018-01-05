@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"
+          rel="stylesheet">
+<style>
+	@media (min-width: 1200px) {
+    .container{
+        max-width: 1800px;
+    }
+}
+
+	.header_text
+	{
+		font-family:    Arial, Helvetica, sans-serif;
+		font-size:      20px;
+		font-weight:    bold;
+		position: relative;
+		text-align:center;
+	}
+
+
+</style>
+  </head>
+  <body>
+    <div class="container">
+	  <div class="panel panel-default">
+        <div class="panel-heading"><img style="width:15%" src="static/images/logo.png" > <br /> <p class="header_text">Intelligent Character Recognition Engine</p></div>
+        <div class="panel-body">
+	  <h4 class="text-muted">Uploaded files</h4>
+      <div>
+      <strong>Number of files uploaded {{ count }}, select and click to process.. </strong>	  
+	  <ul>
+        {% for file in filenames %}
+		<form name="Process" action="process" method="POST">
+		  <div class="checkbox">
+			<input id="{{file}}" name="toprocess[]" type="checkbox" value="{{file}}">
+			<label for="checkbox1">
+				{{file}}
+			</label>
+		</div>
+		
+        {% endfor %}
+		<input class="btn btn-primary" type="submit" value="Submit">
+		</form>
+      </ul>
+      </div>
+      </div>
+    </div>
+	</div>
+  </body>
+</html>
+ 

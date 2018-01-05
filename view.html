@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+
+	<style>
+	
+	
+	@media (min-width: 1200px) {
+    .container{
+        max-width: 1800px;
+    }
+}
+    .box{
+        padding: 5px;
+        display: none;
+        margin-top: 5px;
+    }
+	
+	.header_text
+	{
+		font-family:    Arial, Helvetica, sans-serif;
+		font-size:      20px;
+		font-weight:    bold;
+		position: relative;
+		text-align:center;
+	}
+
+	</style>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    $("select").change(function(){
+        $(this).find("option:selected").each(function(){
+            var optionValue = $(this).attr("value");
+            if(optionValue){
+                $(".box").not("." + optionValue).hide();
+                $("." + optionValue).show();
+            } else{
+                $(".box").show();
+            }
+        });
+    }).change();
+});
+</script>
+
+
+</head>
+
+<title>ICR Output</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='table_style.css') }}">
+<body>
+
+    <div class="container">
+	  <div class="panel panel-default">
+        <div class="panel-heading"><img style="width:15%" src="static/images/logo.png" > <br /> <p class="header_text">Intelligent Character Recognition Engine</p></div>
+        <div class="panel-body">
+	<div>
+	<h3>No of files processsed is {{count}}</h3>
+		<select>
+		<option>Choose Part</option>
+				
+			{% for keys in tables.keys() %}
+				
+				<option value="{{keys}}">{{keys}}</option>
+			{% endfor %}
+        </select>
+    </div>
+	
+			  {% for keys in tables.keys() %}
+			  
+	<div class="{{keys}} box">
+              
+			  <h4 class="text-muted">{{keys}}</h4>
+			  <p class='icons'><a href='static/write/{{keys}}.csv'> <img style="width:32px;height:32px;" src="static/images/download.png" ></a> &nbsp;&nbsp;&nbsp;&nbsp;
+			  <a href='visualize/{{keys}}'> <img style="width:32px;height:32px;" src="static/images/viz.png" ></a>
+			  </p>
+			  
+
+					{{tables[keys]|safe}}
+	</div>	  
+			  {% endfor %}
+	
+			  
+		</div>
+		</div>
+	</div>
+</body>
+</html>
+ 
+

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/style_upload.css" rel="stylesheet">
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/static/upload.js"></script>
+<style>
+	@media (min-width: 1200px) {
+    .container{
+        max-width: 1800px;
+    }
+}
+
+	.header_text
+	{
+		font-family:    Arial, Helvetica, sans-serif;
+		font-size:      20px;
+		font-weight:    bold;
+		position: relative;
+		text-align:center;
+	}
+	
+    #navBarSearchForm input[type=text]{width:600px !important;}
+
+</style>
+</head>
+<div class="container">
+      <div class="panel panel-default">
+        <div class="panel-heading"><img style="width:15%" src="static/images/logo.png" > <br /> <p class="header_text">Optical Character Recognition Engine</p></div>
+        <div class="panel-body">
+		<div class="form-group">
+			<label for="exampleTextarea">OCR Output</label>
+			{% for op in output %}
+			<br /> <br />
+			<textarea class="form-control" id="exampleTextarea" rows="10" width="800px">{{ op }}</textarea>
+			{% endfor %}
+		</div>
+		</div>
+      </div>
+    </div> <!-- /container -->
+	
+</html>

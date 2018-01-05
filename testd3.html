@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<style>
+  body { font: 12px Calibri;}
+
+path { 
+	stroke: steelblue;
+	stroke-width: 2;
+	fill: none;
+}
+
+.axis path,
+.axis line {
+	fill: none;
+	stroke: grey;
+	stroke-width: 1;
+	shape-rendering: crispEdges;
+}
+div.tooltip {   
+  position: absolute;           
+  text-align: center;           
+  width: 60px;                  
+  height: 28px;                 
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: lightsteelblue;   
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none;         
+}
+.grid .tick {
+    stroke: lightgrey;
+    opacity: 0.7;
+}
+.grid path {
+      stroke-width: 0;
+}
+</style>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<body>
+  <script>
+var Legal_Marital_Status = [];
+
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+    y = d3.scaleLinear().rangeRound([height, 0]);
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+console.log(Legal_Marital_Status);
+d3.csv("Part_A.csv", function(error, data) {
+  data.map(function(m){
+    arrestdate.push(m["Legal_Marital_Status"]);
+  })
+  var nested = d3.nest()
+    .key(function (d) { return d['Legal_Marital_Status'] })
+    .entries(data);
+    //console.log(nested[0].key);
+    //console.log(nested[0].values);
+    // Set X to all your 19 keys, which are your years
+    x.domain(nested.map(function(d) { return d.key }))
+    // Set Y between 0 and the maximum length of values, which are your arrests
+    y.domain([0, d3.max(data, function(d) { return d.values.length })])
+
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y).ticks(10, "%"))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Frequency");
+
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("width", x.bandwidth())
+      .attr("x", function(d) { return x(nested[0].values.length); }) //What to put here?
+      .attr("y", function(d) { return y(+nested[0].key); }) // What to put here?
+      .attr("height", function(d) { return height - y(+nested[0].key); });
+});
+  
+  </script>
+
+</body>
+
+</html>
