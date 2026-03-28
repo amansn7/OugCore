@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Agents — DropCore{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-2xl font-bold">Agent Control Panel</h1>
+  <p class="text-gray-500 text-sm mt-1">7 autonomous AI agents running your business pipeline</p>
+</div>
+
+<!-- Agent Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+  {% set agent_icons = {
+    'product_research': '🔍',
+    'price_monitor': '💰',
+    'order_fulfillment': '📦',
+    'customer_service': '💬',
+    'marketing_content': '✍️',
+    'inventory_monitor': '📊',
+    'analytics': '📈',
+  } %}
+  {% set agent_schedules = {
+    'product_research': 'Daily 6am',
+    'price_monitor': 'Every 6h',
+    'order_fulfillment': 'Every 15min',
+    'customer_service': 'Every 10min',
+    'marketing_content': 'On product add',
+    'inventory_monitor': 'Every 2h',
+    'analytics': 'Daily 11pm',
+  } %}
+
+  {% for key, class_name in agent_registry.items() %}
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <div class="flex items-start justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">{{ agent_icons.get(key, '🤖') }}</span>
+        <div>
+          <h3 class="font-semibold text-sm text-gray-800">{{ class_name.replace('Agent', '') }}</h3>
+          <p class="text-xs text-indigo-500">{{ agent_schedules.get(key, 'Scheduled') }}</p>
+        </div>
+      </div>
+      <button onclick="runAgent('{{ key }}')"
+        class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-100 font-medium">
+        ▶ Run Now
+      </button>
+    </div>
+    <p class="text-xs text-gray-400 mt-3 leading-relaxed">
+      {{ agent_descriptions.get(key, '') }}
+    </p>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Scheduler Status -->
+{% if jobs %}
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+  <div class="p-5 border-b border-gray-100">
+    <h3 class="font-semibold text-gray-700">Scheduler Jobs</h3>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+        <tr>
+          <th class="px-5 py-3 text-left">Job ID</th>
+          <th class="px-5 py-3 text-left">Next Run</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for job in jobs %}
+        <tr>
+          <td class="px-5 py-3 font-mono text-xs text-gray-600">{{ job.id }}</td>
+          <td class="px-5 py-3 text-xs text-gray-500">{{ job.next_run }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+
+<!-- Recent Agent Logs -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100">
+  <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+    <h3 class="font-semibold text-gray-700">Recent Agent Logs</h3>
+    <span class="text-xs text-gray-400">Last 50 runs</span>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+        <tr>
+          <th class="px-5 py-3 text-left">Agent</th>
+          <th class="px-5 py-3 text-center">Status</th>
+          <th class="px-5 py-3 text-left">Message</th>
+          <th class="px-5 py-3 text-right">Duration</th>
+          <th class="px-5 py-3 text-right">Time</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for log in logs %}
+        <tr class="hover:bg-gray-50">
+          <td class="px-5 py-3 font-medium text-gray-700 text-xs">{{ log.agent_name }}</td>
+          <td class="px-5 py-3 text-center">
+            <span class="px-2 py-0.5 rounded text-xs font-medium
+              {% if log.status == 'success' %}bg-green-100 text-green-700
+              {% elif log.status == 'error' %}bg-red-100 text-red-700
+              {% elif log.status == 'warning' %}bg-yellow-100 text-yellow-700
+              {% else %}bg-gray-100 text-gray-600{% endif %}">
+              {{ log.status }}
+            </span>
+          </td>
+          <td class="px-5 py-3 text-xs text-gray-500 max-w-sm truncate">{{ log.message or '—' }}</td>
+          <td class="px-5 py-3 text-right text-xs text-gray-400">
+            {% if log.duration_ms %}{{ log.duration_ms }}ms{% else %}—{% endif %}
+          </td>
+          <td class="px-5 py-3 text-right text-xs text-gray-400">
+            {{ log.run_at.strftime('%b %d %H:%M') }}
+          </td>
+        </tr>
+        {% endfor %}
+        {% if not logs %}
+        <tr>
+          <td colspan="5" class="px-5 py-10 text-center text-gray-400 text-sm">
+            No agent runs yet. Click "Run Now" on any agent above to start.
+          </td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toast" class="hidden fixed bottom-5 right-5 bg-gray-900 text-white px-4 py-3 rounded-lg text-sm shadow-lg">
+  Agent started ✓
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function runAgent(key) {
+  fetch(`/dashboard/agents/run/${key}`, { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      const t = document.getElementById('toast');
+      t.textContent = `${key} started ✓`;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3000);
+      setTimeout(() => location.reload(), 4000);
+    })
+    .catch(() => alert('Failed to start agent'));
+}
+</script>
+{% endblock %}
