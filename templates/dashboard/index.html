@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — DropCore{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-8">
+  <div>
+    <h1 class="text-2xl font-bold">Business Dashboard</h1>
+    <p class="text-gray-500 text-sm mt-1">Live dropshipping operations overview</p>
+  </div>
+  <span id="live-indicator" class="flex items-center gap-2 text-xs text-green-600 font-medium">
+    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Live
+  </span>
+</div>
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Today's Revenue</p>
+    <p class="text-3xl font-bold text-gray-900 mt-1">${{ today_revenue }}</p>
+    <p class="text-xs text-gray-400 mt-1">{{ today_order_count }} orders</p>
+  </div>
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Today's Profit</p>
+    <p class="text-3xl font-bold text-green-600 mt-1">${{ today_profit }}</p>
+    <p class="text-xs text-gray-400 mt-1">{{ today_margin }}% margin</p>
+  </div>
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Active Products</p>
+    <p class="text-3xl font-bold text-gray-900 mt-1">{{ active_products }}</p>
+    <p class="text-xs text-gray-400 mt-1">{{ testing_products }} testing</p>
+  </div>
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <p class="text-xs text-gray-500 uppercase tracking-wide">Avg Margin (7d)</p>
+    <p class="text-3xl font-bold text-indigo-600 mt-1">
+      {{ latest_metric.margin_pct if latest_metric else 0 }}%
+    </p>
+    <p class="text-xs text-gray-400 mt-1">Target: ≥ 40%</p>
+  </div>
+</div>
+
+<!-- Secondary KPIs -->
+{% if latest_metric %}
+<div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+  {% set kpis = [
+    ("AOV", "$" ~ latest_metric.aov, "avg order value"),
+    ("Refund Rate", latest_metric.refund_rate ~ "%", "target < 5%"),
+    ("Fulfillment", latest_metric.fulfillment_avg_hours ~ "h", "target < 8h"),
+    ("New Customers", latest_metric.new_customers, "yesterday"),
+    ("Returning", latest_metric.returning_customers, "yesterday"),
+  ] %}
+  {% for label, value, sub in kpis %}
+  <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-100 text-center">
+    <p class="text-xs text-gray-400">{{ label }}</p>
+    <p class="text-xl font-bold text-gray-800 mt-1">{{ value }}</p>
+    <p class="text-xs text-gray-400">{{ sub }}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+  <!-- Revenue vs Profit -->
+  <div class="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <h3 class="font-semibold text-sm text-gray-700 mb-4">Revenue vs Profit (7 days)</h3>
+    <canvas id="revenueChart" height="120"></canvas>
+  </div>
+
+  <!-- Order Status Doughnut -->
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <h3 class="font-semibold text-sm text-gray-700 mb-4">Order Status Breakdown</h3>
+    <canvas id="statusChart" height="160"></canvas>
+    <div class="mt-3 space-y-1">
+      {% for status, count in status_counts.items() %}
+      {% if count > 0 %}
+      <div class="flex justify-between text-xs text-gray-600">
+        <span class="capitalize">{{ status }}</span>
+        <span class="font-medium">{{ count }}</span>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Live Feed + Orders chart -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Orders trend -->
+  <div class="lg:col-span-2 bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <h3 class="font-semibold text-sm text-gray-700 mb-4">Daily Orders (7 days)</h3>
+    <canvas id="ordersChart" height="120"></canvas>
+  </div>
+
+  <!-- Live order feed (SSE) -->
+  <div class="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+    <h3 class="font-semibold text-sm text-gray-700 mb-3">Live Order Feed</h3>
+    <div id="live-feed" class="space-y-2 max-h-64 overflow-y-auto text-xs text-gray-600">
+      <p class="text-gray-400 italic">Waiting for new orders...</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const labels = {{ chart_labels | safe }};
+const revenue = {{ chart_revenue | safe }};
+const profit = {{ chart_profit | safe }};
+const orders = {{ chart_orders | safe }};
+const statusCounts = {{ status_counts | tojson }};
+
+// Revenue vs Profit chart
+new Chart(document.getElementById('revenueChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Revenue',
+        data: revenue,
+        borderColor: '#6366f1',
+        backgroundColor: 'rgba(99,102,241,0.08)',
+        tension: 0.4,
+        fill: true,
+      },
+      {
+        label: 'Profit',
+        data: profit,
+        borderColor: '#22c55e',
+        backgroundColor: 'rgba(34,197,94,0.08)',
+        tension: 0.4,
+        fill: true,
+      }
+    ]
+  },
+  options: {
+    plugins: { legend: { position: 'top' } },
+    scales: { y: { beginAtZero: true } },
+  }
+});
+
+// Status doughnut
+const statusLabels = Object.keys(statusCounts).filter(k => statusCounts[k] > 0);
+const statusData = statusLabels.map(k => statusCounts[k]);
+const statusColors = {
+  pending: '#94a3b8', fulfilled: '#60a5fa', shipped: '#818cf8',
+  delivered: '#4ade80', refunded: '#f87171', failed: '#ef4444'
+};
+new Chart(document.getElementById('statusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: statusLabels,
+    datasets: [{ data: statusData, backgroundColor: statusLabels.map(l => statusColors[l] || '#ccc') }]
+  },
+  options: { plugins: { legend: { display: false } }, cutout: '65%' }
+});
+
+// Daily orders bar
+new Chart(document.getElementById('ordersChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{ label: 'Orders', data: orders, backgroundColor: '#a5b4fc' }]
+  },
+  options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+// Live SSE feed
+const feed = document.getElementById('live-feed');
+const evtSource = new EventSource('/dashboard/stream');
+evtSource.onmessage = function(e) {
+  try {
+    const order = JSON.parse(e.data);
+    const el = document.createElement('div');
+    el.className = 'flex justify-between items-center py-1 border-b border-gray-50';
+    el.innerHTML = `
+      <span class="text-gray-700 font-medium">#${order.store_order_id}</span>
+      <span class="text-green-600 font-semibold">$${order.total_revenue}</span>
+    `;
+    if (feed.children[0]?.classList.contains('italic')) feed.innerHTML = '';
+    feed.prepend(el);
+  } catch(err) {}
+};
+</script>
+{% endblock %}
