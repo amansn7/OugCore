@@ -56,3 +56,8 @@ target/
 # Other
 flask_server_old
 blog.md
+
+# DropCore runtime files
+instance/
+*.db
+.env
